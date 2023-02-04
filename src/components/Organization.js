@@ -27,6 +27,7 @@ const Organization  = () => {
 
 const submitHandler = (event) => {
 event.preventDefault();
+const SetEmail = event.target.email.value;
 const organizationname = event.target.organizationname.value;
 const sector = event.target.sector.value;
 const email = event.target.email.value;
