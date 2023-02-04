@@ -1,37 +1,57 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import './Footer.css';
+import axios from 'axios';
+import validator from 'validator';
+
+import Demo from './Demo';
 
 import './Organization.css';
 import {Button, Modal, Form } from 'react-bootstrap';
-import Demo from './Demo';
+// import Demo from './Demo';
+
 const Organization  = () => {
 
-const [organizationname, setOrganizationname ] = useState("");
-const [sector, setSector] = useState("");
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
-const [firstname, setFirstname] = useState("");
-const [lastname, setLastname] = useState("");
-const [phonenumber, setPhonenumber] = useState("");
-const history= useHistory();
-async function signUp(){
-    let item = {organizationname, sector, email, password, firstname, lastname, phonenumber}
-    console.warn(item)
+    const [email,setEmail]=useState();
+    const [emailError, setEmailError] = useState('')
+    const validateEmail = (event) => {
+      var email = event.target.value
+    
+      if (validator.isEmail(email)) {
+        setEmailError('Valid Email :)')
+      } else {
+        setEmailError('Enter valid Email!')
+    
+      }
+    }
 
-    let result = await fetch("http://34.205.65.36:4000/client", {
-        method: "POST",
-        body: JSON.stringify(item),
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
+const submitHandler = (event) => {
+event.preventDefault();
+const organizationname = event.target.organizationname.value;
+const sector = event.target.sector.value;
+const email = event.target.email.value;
+const password = event.target.password.value;
+const firstname = event.target.firstname.value;
+const lastname = event.target.lastname.value;
+const phonenumber = event.target.phonenumber.value;
+const data = {organizationname, sector, email, password, firstname, lastname, phonenumber};
+console.log(data);
+axios.post("http://34.205.65.36:4000/client/", 
+    data
 
-    })
-    result = await result.json()
-    localStorage.setItem("user-info",JSON.stringify(result))
-    history.push("/add")
-}
+)
+.then(response => {
+    console.log(response);
+    // event.target.reset();
+    window.alert("Your Data is saved Successfully");
+
+
+})
+.catch(error =>{
+    console.log(error);
+    window.alert("Something went wrong");
+})
+};
   return (
     <div>
          
@@ -46,42 +66,45 @@ async function signUp(){
             </div>
             <div id="signupSec">
                 <div id="signupDiv">
-                    <form onsubmit="signup(event)">
+                    <form name="signupForm" onSubmit={submitHandler}>
                     <div class="details1">
                             <label>Company Name</label>
-                            <input placeholder="Kutumb Aspiration" value={ organizationname } onChange={(e) => setOrganizationname(e.target.value)} />
+                            <input placeholder="Kutumb Aspiration" name="organizationname" required  />
                         </div>
                         <div class="details1">
                             <label>Sector</label>
-                            <input placeholder="Education" value={ sector } onChange={(e) => setSector(e.target.value)} />
+                            <input placeholder="Education" name="sector"  />
                         </div>
                         
                         <div class="details1">
                             <label>Official Email Id</label>
-                            <input placeholder="name@company_name.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input placeholder="name@company_name.com" name="email" onChange={(event) => validateEmail(event)} required />
+                            <br />
+        <span>{emailError}</span>
+      
                         </div>
                         <div class="details1">
                             <label>Password</label>
-                            <input placeholder="Minimum 6 characters" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                            <input placeholder="Minimum 6 characters" type="password" name="password" required />
                         </div>
                         <div id="name">
                             <div class="details1">
                                 <label>First Name</label>
-                                <input placeholder="Your First Name" value={firstname} onChange={(e) => setFirstname(e.target.value)} />
+                                <input placeholder="Your First Name" name="firstname" required />
                             </div>
                             <div class="details1">
                                 <label>Last Name</label>
-                                <input placeholder="Your Last Name" value={lastname} onChange={(e) => setLastname(e.target.value)} />
+                                <input placeholder="Your Last Name" name="lastname" required />
                             </div>
                         </div>
                         <div class="details2">
                             <label>Mobile Number</label><br/>
                             <input value="+91" id="code"/>
-                            <input type="number" placeholder="10 digit mobile number" id="mob" value={phonenumber} onChange={(e) => setPhonenumber(e.target.value)} />
+                            <input type="number" placeholder="10 digit mobile number" id="mob" name="phonenumber" required />
                         </div>
                         <p id="tc">By signing up, you agree to our <span>Terms and Conditions</span>.</p>
-                      
-                        <Demo />
+                     
+                     <Demo email={ email }/>
                     </form>
                     <p id="msg_regEmployer"><span>Have a question?</span></p>
                 </div>
